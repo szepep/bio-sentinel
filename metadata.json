@@ -1,0 +1,6 @@
+{
+  "name": "Bio-Sentinel RLHF",
+  "description": "A health monitor and RLHF training dashboard for analyzing Garmin clinical bio-metrics (HRV, RHR, Respiration) and distinguishing sickness from lifestyle noise using Gemini predictions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
