@@ -28,12 +28,39 @@ class GarminAdapter(MetricsPort):
                 session_json = base64.b64decode(self.session_data_b64).decode('utf-8')
                 token_dict = json.loads(session_json)
                 
-                # Re-hydrate the Garmin client with existing session
-                self.client = Garmin()
-                self.client.login_data = token_dict
-                self.client.is_logged_in = True
-                logging.info("Garmin session restored successfully!")
-                return
+                # Check if it is a dictionary of serialized garth files
+                is_garth_dir_dump = any(isinstance(k, str) and k.endswith('.json') for k in token_dict.keys())
+                
+                if is_garth_dir_dump:
+                    import tempfile
+                    import garth
+                    # Create temporary folder and dump the credentials files there
+                    temp_dir = tempfile.mkdtemp()
+                    for filename, file_content in token_dict.items():
+                        import os
+                        filePath = os.path.join(temp_dir, filename)
+                        with open(filePath, 'w', encoding='utf-8') as f:
+                            # If content is already a dict/list, serialize to json, else write as str
+                            if isinstance(file_content, (dict, list)):
+                                json.dump(file_content, f)
+                            else:
+                                f.write(str(file_content))
+                    
+                    logging.info(f"Loading garth folder state configuration from temporary directory {temp_dir}...")
+                    garth.load(temp_dir)
+                    
+                    # Instantiate client, it will automatically leverage garth global authenticated state
+                    self.client = Garmin()
+                    self.client.is_logged_in = True
+                    logging.info("Garmin session restored successfully via garth folder states!")
+                    return
+                else:
+                    # Re-hydrate the Garmin client with legacy single login_data dict
+                    self.client = Garmin()
+                    self.client.login_data = token_dict
+                    self.client.is_logged_in = True
+                    logging.info("Garmin session restored successfully!")
+                    return
             except Exception as e:
                 logging.warning(f"Failed to restore Garmin session from token: {e}. Falling back to standard credentials.")
 

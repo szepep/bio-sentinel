@@ -18,8 +18,15 @@ To bypass Multi-Factor Authentication (MFA) on cold-start runner instances, Bio-
   * `GARMIN_EMAIL`: Your Garmin Connect account email.
   * `GARMIN_PASSWORD`: Your Garmin Connect account password.
 * **Option B: Persistent Session Token (Highly Recommended to bypass MFA limitations)**
-  * To bypass MFA safely, you can log in once locally using `python-garminconnect`, extract the token, stringify or base64-encode the dictionary object, and store it in GitHub.
-  * `GARMIN_SESSION`: The Base64 string representing your initialized token payload.
+  * To bypass MFA safely, you can use the interactive CLI helper script included in this repository. Run it locally once from your computer's terminal:
+    ```bash
+    pip install python-garminconnect garth
+    python get_garmin_session.py
+    ```
+  * Follow the terminal prompts. It will ask for your email, password, and guide you through entering the MFA authentication code.
+  * It will then generate a single, clean **Base64 encoded block string**. Copy that text block.
+  * Save the copied string in GitHub Secrets as `GARMIN_SESSION`. 
+  * If `GARMIN_SESSION` is detected, the workflow will use it directly to bypass any authentication steps and MFA queries on headless runner containers!
 
 ---
 
